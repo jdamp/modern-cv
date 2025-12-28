@@ -113,13 +113,13 @@
   __justify_align_3[
     #__apply_smallcaps(date, use-smallcaps)
   ][
-    #__apply_smallcaps(
-      {
-        let name = __format_author_name(author, language)
-        name + " · " + linguify("resume", from: lang_data)
-      },
-      use-smallcaps,
-    )
+    // #__apply_smallcaps(
+    //   {
+    //     let name = __format_author_name(author, language)
+    //     name + " · " + linguify("resume", from: lang_data)
+    //   },
+    //   use-smallcaps,
+    // )
   ][
     #context {
       counter(page).display()
@@ -216,6 +216,7 @@
   paper-size: "a4",
   use-smallcaps: true,
   show-address-icon: false,
+  title: none,
   description: none,
   keywords: (),
   body,
@@ -226,9 +227,12 @@
 
   let lang_data = toml("lang.toml")
 
+  let default_title = lflib._linguify("resume", lang: language, from: lang_data).ok
+  let doc_title = if title == none { default_title } else { title }
+
   let desc = if description == none {
     (
-      lflib._linguify("resume", lang: language, from: lang_data).ok + " " + author.firstname + " " + author.lastname
+      default_title + " " + author.firstname + " " + author.lastname
     )
   } else {
     description
@@ -237,7 +241,7 @@
   show: body => context {
     set document(
       author: author.firstname + " " + author.lastname,
-      title: lflib._linguify("resume", lang: language, from: lang_data).ok,
+      title: doc_title,
       description: desc,
       keywords: keywords,
     )
@@ -702,6 +706,7 @@
   paper-size: "a4",
   use-smallcaps: true,
   show-address-icon: false,
+  title: none,
   description: none,
   keywords: (),
   signature: image,
@@ -718,9 +723,12 @@
     closing = default-closing(lang_data)
   }
 
+  let default_title = lflib._linguify("cover-letter", lang: language, from: lang_data).ok
+  let doc_title = if title == none { default_title } else { title }
+
   let desc = if description == none {
     (
-      lflib._linguify("cover-letter", lang: language, from: lang_data).ok
+      default_title
         + " "
         + author.firstname
         + " "
@@ -733,7 +741,7 @@
   show: body => context {
     set document(
       author: author.firstname + " " + author.lastname,
-      title: lflib._linguify("cover-letter", lang: language, from: lang_data).ok,
+      title: doc_title,
       description: desc,
       keywords: keywords,
     )
@@ -918,13 +926,13 @@
   let signature = {
     align(bottom)[
       #pad(bottom: 2em)[
-        #if ("signature" in author) {
-          author.signature
-        }
         #text(weight: "light")[#linguify("sincerely", from: lang_data)#if (
             language != "de"
           ) [#sym.comma]] \
         #text(weight: "bold")[#author.firstname #author.lastname] \ \
+        #if ("signature" in author) {
+          author.signature
+        }
       ]
     ]
   }
