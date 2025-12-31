@@ -153,7 +153,7 @@
 /// Right section of a tertiaty headers.
 /// - body (content): The body of the right header
 #let tertiary-right-header(body) = {
-  set text(weight: "light", size: 9pt)
+  set text(weight: "light", size: 10pt)
   body
 }
 
