@@ -1,9 +1,8 @@
 #import "@preview/fontawesome:0.6.0": *
 #import "@preview/linguify:0.4.2": *
 
-// TODO(PT): Move to Fontawesome 7
-// for now, specify Fontawesome 6
-#fa-version("6")
+// Fontawesome 7
+#fa-version("7")
 
 // const color
 #let color-darknight = rgb("#131A28")
@@ -121,9 +120,9 @@
     //   use-smallcaps,
     // )
   ][
-    #context {
-      counter(page).display()
-    }
+    // #context {
+    //   counter(page).display()
+    // }
   ]
 }
 
@@ -443,15 +442,15 @@
         contact-item(
           (text: "@" + author.bluesky, icon: bluesky-icon, link: author.bluesky),
           link-prefix: "https://bsky.app/profile/",
-        )
+        ),
       )
     }
     if "mastodon" in author {
       items.push(
         contact-item(
           (text: "@" + author.mastodon, icon: mastodon-icon, link: author.mastodon),
-          link-prefix: "https://mastodon.social/@"
-        )
+          link-prefix: "https://mastodon.social/@",
+        ),
       )
     }
     if "scholar" in author {
@@ -668,7 +667,7 @@
 /// ---- Coverletter ----
 
 #let default-closing(lang-data) = {
-  align(bottom)[
+  pad(top: 0.5em)[
     #text(weight: "light", style: "italic")[
       #linguify("attached", from: lang-data)#sym.colon #linguify(
         "curriculum-vitae",
@@ -719,20 +718,13 @@
   // language data
   let lang_data = toml("lang.toml")
 
-  if closing == none {
-    closing = default-closing(lang_data)
-  }
 
   let default_title = lflib._linguify("cover-letter", lang: language, from: lang_data).ok
   let doc_title = if title == none { default_title } else { title }
 
   let desc = if description == none {
     (
-      default_title
-        + " "
-        + author.firstname
-        + " "
-        + author.lastname
+      default_title + " " + author.firstname + " " + author.lastname
     )
   } else {
     description
@@ -924,15 +916,27 @@
   }
 
   let signature = {
-    align(bottom)[
-      #pad(bottom: 2em)[
-        #text(weight: "light")[#linguify("sincerely", from: lang_data)#if (
-            language != "de"
-          ) [#sym.comma]] \
-        #text(weight: "bold")[#author.firstname #author.lastname] \ \
-        #if ("signature" in author) {
-          author.signature
-        }
+    let signature-line-length = if ("signature_line_length" in author) {
+      author.signature_line_length
+    } else {
+      4cm
+    }
+
+    pad(top: 1em, bottom: 2em)[
+      #text(weight: "light")[#linguify("sincerely", from: lang_data)#if (
+          language != "de"
+        ) [#sym.comma]] \
+      #if ("signature" in author) [
+        \
+        #stack(
+          dir: ttb,
+          spacing: 4pt,
+          author.signature,
+          line(length: signature-line-length, stroke: 0.5pt + black),
+          [#text(weight: "bold")[#author.firstname #author.lastname]],
+        )
+      ] else [
+        #text(weight: "bold")[#author.firstname #author.lastname]
       ]
     ]
   }
@@ -940,7 +944,7 @@
   // actual content
   letter-heading
   body
-  linebreak()
+  //linebreak()
   signature
   closing
 }
@@ -1001,7 +1005,7 @@
 /// - content (content): The content of the cover letter
 #let coverletter-content(content) = {
   pad(top: 1em, bottom: 1em)[
-    #set par(first-line-indent: 3em)
+    #set par(first-line-indent: 0em, spacing: 1em)
     #set text(weight: "light")
     #content
   ]
