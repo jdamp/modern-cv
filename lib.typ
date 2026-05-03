@@ -968,7 +968,7 @@
     #pad(top: 0.65em, bottom: 0.65em)[
       #text(weight: "regular", fill: color-gray, size: 9pt)[
         #__apply_smallcaps(entity-info.name, use-smallcaps) \
-        #entity-info.street-address \
+        #if entity-info.at("street-address", default: "") != "" [#entity-info.street-address \ ]
         #entity-info.city \
       ]
     ]
